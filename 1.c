@@ -28,7 +28,7 @@ int iteSumMultiples3or5(){
 
 int main(){
 
-//	printf("%i\n",iteSumMultiples3or5());
-//	printf("%i\n",recSumMultiples3or5(3,0,1000));
+	printf("%i\n",iteSumMultiples3or5());
+	printf("%i\n",recSumMultiples3or5(3,0,1000));
 
 }

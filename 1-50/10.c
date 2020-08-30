@@ -22,7 +22,7 @@ int prime(unsigned long long int n){
 
 int main(){
 	long int i,s=2;
-	for (i=2;i<2000000;i++)
+	for (i=3;i<2000000;i+=2)
 		if (prime(i)){	
 			s+=i;
 		}

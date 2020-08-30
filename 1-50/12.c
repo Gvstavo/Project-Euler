@@ -1,4 +1,5 @@
-#include "stdio.h"
+#include <stdio.h>
+#include <math.h>
 /*
 
 
@@ -23,22 +24,78 @@ What is the value of the first triangle number to have over five hundred divisor
 
 */
 
-int div(long int a){
-	long int i=0,div=0;
+int primes[10000] = {0};
+ 
+ int prime(unsigned long long int n){
+	if (n==2 || n==3 || n==5 || n==7)
+		return 1;
+	if (n % 2 == 0 || n==1)
+		return 0;
+	unsigned long long int lim=ceil(sqrt(n));
+	unsigned long long int i=1;
 	do{
-		i++;
-		if (a % i == 0){
-			div++;
-		}
-	}while (i!=a);
-	return div;
+		i+=2;
+		if ( n % i == 0)
+			return 0;
+	}while(i<lim);
+	return 1;
 }
+
+int n_div(unsigned long int n){
+
+	int ret = 1;
+	int i = 0;
+ unsigned long int div = 1;
+	for(i=0;n!=1;i++){
+ 		if(!(n % primes[i]))
+			for(int k = 1;;k++){
+				div = 1;
+  			if(!(n % primes[i])){
+					 div *= primes[i];
+					 n/=div;
+
+ 				}
+ 				else{
+					ret*=k;
+					break;
+				}
+			}
+		if (ret > 500)
+			return ret;	
+
+	}
+
+	return ret;
+
+
+
+}
+
+    
 int main(){
-	long int p,i=0,s=0;
-	do{
-		i++;
-		s+=i;
-		p=div(s);
-	}while (p<500); 
-	printf ("\n%li",s);
+
+	unsigned long int register i;
+	unsigned long int n = 0;
+	unsigned long int ret = 0;
+	int index =0;
+	for(i = 2;index < 10000 ; i++)
+		if(prime(i) ){
+			primes[index] = i;
+ 			index++;
+		}
+
+
+	for(i=1;ret < 500 ;i++){
+
+		n = (i*(i + 1))/2;
+		 
+		ret = n_div(n);
+
+
+	}
+	 printf("%i\n",n);
+ 
+
+	
+
 }

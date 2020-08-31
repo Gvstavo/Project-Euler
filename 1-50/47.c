@@ -23,7 +23,7 @@ Find the first four consecutive integers to have four distinct prime factors eac
 
 */
 
-int primes[10000] = {0};
+int primes[100000] = {0};
 
 
 int cmp(const void * a, const void * b) {
@@ -64,7 +64,9 @@ int prime_factors(int n , unsigned long int f[] ){
   				 
   		div*=primes[i];
 
+  	if(primes[i] == 0) puts("...");
   	div/=primes[i];
+
   	n/=div;
   	if (div != 1){
 
@@ -89,9 +91,9 @@ void assign_array(unsigned long int arr1[] , const unsigned long int arr2[]) {
 
 }
 
-int create_array(const unsigned long int arr1[],const unsigned long int arr2[],const unsigned long int arr3[], int i1, int i2,int i3){
+int create_array(const unsigned long int arr1[],const unsigned long int arr2[],const unsigned long int arr3[], const unsigned long int arr4[],int i1, int i2,int i3, int i4){
 
-	int size = i1+i2+i3;
+	int size = i1+i2+i3+i4;
 	long int new_arr[size] ;
 
 	int i = 0;
@@ -114,7 +116,10 @@ int create_array(const unsigned long int arr1[],const unsigned long int arr2[],c
 		new_arr[index] = arr3[i];
 		index++;
 	}
-
+	for(i = 0; i < i4; i++ ){
+		new_arr[index] = arr4[i];
+		index++;
+	}
 
 
 	qsort(new_arr, size, sizeof(long int), cmp);
@@ -122,35 +127,35 @@ int create_array(const unsigned long int arr1[],const unsigned long int arr2[],c
 	for(i = 0; i < size-1; i++){
 		if(new_arr[i] == new_arr[i+1])
 			dup++;
-	//		printf(" %i ",new_arr[i]);
+	
 	}
-	 return size - dup;
-//	
 
+	return size - dup ;
 
 
 	
-
-
 }
 
-int prime_diff(unsigned long int n1, unsigned long int n2, unsigned long int n3, int leftover){
+int prime_diff(unsigned long int n1, unsigned long int n2, unsigned long int n3, unsigned long int n4,int leftover){
 
-	static unsigned long int cache[3];
+	static unsigned long int cache[4];
 	static unsigned long int factors0[100] ; 
 	static unsigned long int factors1[100] ; 
 
 	static unsigned long int factors2[100] ; 
+	static unsigned long int factors3[100];
 	int aux = 0;
-	static int index0 , index1 , index2;
+	static int index0 , index1 , index2, index3;
 
 	if ( !leftover){
 		cache[0] = n1;
 	 	cache[1] = n2;
-	 	cache[2] = n3; 
+	 	cache[2] = n3;
+	 	cache[3] = n4; 
 	 	index0 = 0; 
 	 	index1 = 0; 
 	 	index2 = 0;
+	 	index3 = 0;
 
 		memset(factors0, 0 , sizeof(factors0));
 
@@ -158,79 +163,99 @@ int prime_diff(unsigned long int n1, unsigned long int n2, unsigned long int n3,
 
 		memset(factors2, 0 , sizeof(factors2));
 
+		memset(factors3, 0 , sizeof(factors3));
+
 	 	index0 = prime_factors(n1 , factors0);
 	 	index1 = prime_factors(n2 , factors1);
 	 	index2 = prime_factors(n3 , factors2);
-	// 	printf("%i %i %i\n", cache[0],cache[1],cache[2]);
+	 	index3 = prime_factors(n4 , factors3);
 	}
 
 	if(leftover == 1){
 
 		cache[0] = cache[1];
 		cache[1] = cache[2];
-		cache[2] = n3;
+		cache[2] = cache[3];
+		cache[3] = n4;
+
+
+		index0 = index1;
+		index1 = index2;
+		index2 = index3;
+
+	
+		
 
 		memset(factors0, 0 , sizeof(factors0));
-		assign_array(factors0, factors1);
-		index0 =  index1;
+	 	assign_array(factors0, factors1);
+		
 
-		memset(factors1, 0 , sizeof(factors1));
-		assign_array(factors1, factors2);
-		index1 = index2;  
+	 	memset(factors1, 0 , sizeof(factors1));
+	 	assign_array(factors1, factors2);
+		
 
 		
-		memset(factors2, 0 , sizeof(factors2));
-		index2 = prime_factors(n3 , factors2);
+	 	memset(factors2, 0 , sizeof(factors2));
+	 	assign_array(factors2, factors3);
 
-	//	printf("%i %i %i\n", cache[0],cache[1],cache[2]);
+		memset(factors3, 0 , sizeof(factors3));
+
+	 	index3 = prime_factors(n4 , factors3);
+	
 
 	}
 
 	if(leftover == 2){
 
 		cache[0] = cache[1];
-		cache[1] = n2;
+		cache[1] = cache[2];
 		cache[2] = n3;
+		cache[3] = n4;
 
-		memset(factors0, 0 , sizeof(factors0));	
+		memset(factors0, 0 , sizeof(factors0));
 		assign_array(factors0, factors1);
 
+		memset(factors1, 0 , sizeof(factors1));
+		assign_array(factors1, factors2);
+
 		index0 = index1;
-		
-		memset(factors1, 0 , sizeof(factors1));	
+		index1 = index2;
+
 		memset(factors2, 0 , sizeof(factors2));	
+		memset(factors3, 0 , sizeof(factors3));
 
-		index1 = prime_factors(n2 , factors1);
 		index2 = prime_factors(n3,  factors2);
-
-	//	printf("%i %i %i\n", cache[0],cache[1],cache[2]);
+		index3 = prime_factors(n4,  factors3);
+		
 
 	}
 
-	return create_array(factors0,factors1,factors2, index0+1,index1+1,index2+1); 
-	// printf("%i\n",n1);
-	// for(int i = 0; i<index0+1;i++)
-	// 	printf(" %i\n",factors0[i]);
+	if(leftover == 3){
 
+		cache[0] = cache[1];
+		cache[1] = n2;
+		cache[2] = n3;
+		cache[3] = n4;
 
-	// printf("%i\n",n2);
-	// for(int i = 0; i<index1+1;i++)
-	// 	printf(" %i\n",factors1[i]);
+		index0 = index1;
 
+		memset(factors0, 0 , sizeof(factors0));
+		assign_array(factors0, factors1); 
 
-	// printf("%i\n",n3);
-	// for(int i = 0; i<index2+1;i++)
-	// 	printf(" %i\n",factors2[i]);
-// return 4; 
+		memset(factors1, 0 , sizeof(factors1));
+		memset(factors2, 0 , sizeof(factors2));	
+		memset(factors3, 0 , sizeof(factors3));
+
+		index1 = prime_factors(n2 , factors1);
+		index2 = prime_factors(n3,  factors2);
+		index3 = prime_factors(n4,  factors3);
+
+	}
+
+	
+	return create_array(factors0,factors1,factors2, factors3,index0+1,index1+1,index2+1,index3+1); 
 
 	 
-
-
-
-
-
-
-
 
 
 
@@ -238,28 +263,29 @@ int prime_diff(unsigned long int n1, unsigned long int n2, unsigned long int n3,
 
 int main(){
 
-	unsigned long int register i;
+	unsigned long long int register i;
 	int index =0;
 	int ret;
-	int leftover = 0;	
+	unsigned long long  int leftover = 0;	
 
 
-	for(i = 2;index < 10000 ; i++)
+	for(i = 2;index < 100000 ; i++)
 		if(prime(i) ){
 			primes[index] = i;
  			index++;
 		}
 
-//	prime_diff(20 , 22 ,26, leftover % 3);
 
-	for(i=14 ;;i++ ){
+	for(i=644;;i++ ){
 
-		ret = prime_diff(i , i+1 ,i + 2, leftover % 3);
+		ret = prime_diff(i , i+1 ,i + 2, i+3,leftover % 4);
+		
 		leftover++;
-		if (ret == 9)
+
+		if (ret >= 16)
 			break;
 	}
-	//prime_diff(28 , 1 , 2);
+
 	printf("%lu\n",i);
 
 

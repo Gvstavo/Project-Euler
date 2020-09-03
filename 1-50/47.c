@@ -64,7 +64,7 @@ int prime_factors(int n , unsigned long int f[] ){
   				 
   		div*=primes[i];
 
-  	if(primes[i] == 0) puts("...");
+  	
   	div/=primes[i];
 
   	n/=div;

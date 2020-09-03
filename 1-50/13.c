@@ -34,30 +34,25 @@ int sum(int n[][50] , unsigned long int result[]){
 	int index = 1023;
 	unsigned long int s = 0 ;
 	unsigned long int aux = 0 ;
-	for(int i = 99; i >= 0; i-- ){
-		for(int k = 50; k >=0 ; k--)	
-			s+=n[i][k];
-
+	for(int i = 49; i >= 0; i-- ){
+		for(int k = 99; k >=0 ; k--){
+			s+=n[k][i];
+		}
 		if (s < 10){
-			aux = 0;
 			result[index] = s;
 			s = 0;
-		}
-
+			aux = 0;
+		}	
 		else{
-
-			aux = (int)s / 10;
-			result[index] = !i ? s : s % 10;
-			s = aux;
-
+			
+			result[index] = !i? s : s % 10;
+			s/=10;
+	
 		}
 
 		index--;
-		
-
-	
 	}
-	return index;		
+	return index;
 
 }
 
@@ -75,16 +70,12 @@ int main(){
 	parse_array(n , str);
 
 	ret = sum(n , result);
-	//printf("%i\n",sum(n , result));
 
 	for(int i = 0; i < 1024; i++)
 
 		printf("%i",result[i]);
-	// for(int i = 0; i < 100; i++ ){
-	// 	for(int k = 0; k < 50 ; k++)
-	// 		printf("%i",n[i][k]);
-	puts("\n");
-	// }
+
+	
 	
 
 }

@@ -29,7 +29,7 @@ int main(){
 	r=BN_bn2dec(a);
 	for (i=0;i<strlen(r);i++)
 		s+=r[i]-'0';
-	printf ("%s\n",r);
+	printf ("%li\n",s);
 
 	
 

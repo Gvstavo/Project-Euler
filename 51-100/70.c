@@ -1,6 +1,7 @@
 #include<stdio.h>
+#include<stdlib.h>
 #include<math.h>
-
+#define LIM 10000000
 
 /*
 
@@ -19,36 +20,61 @@ Find the value of n, 1 < n < 107, for which φ(n) is a permutation of n and the 
 */
 
 
-int phi(int n){
-	int k=2;
-	float phi=(float)n;
+int prime(unsigned long long int n){
+	if (n==2 || n==3 || n==5 || n==7)
+		return 1;
+	if (n % 2 == 0 || n==1)
+		return 0;
+	unsigned long long int lim=ceil(sqrt(n));
+	unsigned long long int i=1;
+	do{
+		i+=2;
+		if ( n % i == 0)
+			return 0;
+	}while(i<lim);
+	return 1;
+}
+
+ 
+unsigned long long int phi(int n, const unsigned long long int primes[]){
+
+	unsigned long long int _n = n/2;
+
+	unsigned long long int i = 0;
+
+	float phi = (float)n;
+
 	float aux;
-	if(!(n % k)){
-		while(!(n % k))
-			n/=k;
-		phi/=2.0;
-	}
-	k=3;
-	while(n>1){
-		if(!(n % k)){
-			while(!(n % k))
-				n/=k;
-			aux=1.0-(1.0/(float)k);
-			phi*=aux;
+
+	for(i=0;i<n;i++)
+		if(!(n % (i + 1)) && !primes[i]){
+			aux =  (float)1.0 - (1.0 / ((float)i + (float)1.0));
+			phi *= aux;
 		}
-		k+=2;
-	}
-	return phi;
+
+
+	return phi;	
+
 }
 
 
 int main(){
 
-	unsigned long int lim = pow(10,6);
 
-	unsigned long int i = 2;
 
-	for(i=1;i<lim;i++)
-		phi(i);
+
+	unsigned long long int *p;
+
+	unsigned long long int  i;
+
+	p = (unsigned long long int*)calloc(LIM,sizeof(unsigned long long int));
+
+
+	for(i = 0 ; i < LIM ; i++){
+		p[i] = prime(i+1);
+		if (!p[i])
+			p[i] = phi(i+1,p); 
+	}
+	
 
 }

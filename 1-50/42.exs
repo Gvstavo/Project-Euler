@@ -48,7 +48,7 @@ sum_txt = File.read!("p042_words.txt")
 
 					end)
 					|> Enum.reduce(0 , fn x, acc -> 
-						#x |> IO.inspect
+
 						if is_triangular.(x), do: acc + 1 ,
 						else: acc
 

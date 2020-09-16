@@ -22,8 +22,8 @@ defmodule Roman do
 
 	def number(x) when x == "I", do:  1
 	def number(x) when x == "IV", do:  4
-	def number(x) when x == "IX", do:  9
 	def number(x) when x == "V", do:  5
+	def number(x) when x == "IX", do:  9
 	def number(x) when x == "X", do:  10
 	def number(x) when x == "XL", do:  40
 	def number(x) when x == "L", do:  50
@@ -33,6 +33,21 @@ defmodule Roman do
 	def number(x) when x == "CD", do:  400
 	def number(x) when x == "CM", do:  900
 	def number(x) when x == "M", do:  1000
+
+
+	def number(x) when x == 1, do: "I"
+	def number(x) when x == 4, do: "IV"
+	def number(x) when x == 9, do: "IX"
+	def number(x) when x == 5, do:  "V"
+	def number(x) when x == 10, do:  "X"
+	def number(x) when x == 40, do:  "XL"
+	def number(x) when x == 50, do:  "L"
+	def number(x) when x == 90, do:  "XC"
+	def number(x) when x == 100, do:  "X"
+	def number(x) when x == 400, do:  "CD"
+	def number(x) when x == 500, do:  "D"
+	def number(x) when x == 900, do:  "CM"
+	def number(x) when x == 1000, do:  "M"
 
 
 	def to_dec(x) when is_list(x) do
@@ -60,12 +75,27 @@ defmodule Roman do
 
 	end 
 
+	def from(x) when is_list(x) do
+		
+		x
+		|> Enum.reverse(fn x -> end)
+
+	end
+
+	def from(x) when is_integer(x) do
+		x
+		|> Integer.digits
+		|> Roman.from		
+
+		
+	end
+
 end
 
 
 
 
-Roman.to_dec("XIX")
+Roman.to_dec("XIX") |> IO.inspect
 
 
 # end		

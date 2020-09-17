@@ -15,8 +15,6 @@
 
 # Find the number of characters saved by writing each of these in their minimal form.
 
-
-
 defmodule Roman do
 	
 
@@ -43,7 +41,7 @@ defmodule Roman do
 	def number(x) when x == 40, do:  "XL"
 	def number(x) when x == 50, do:  "L"
 	def number(x) when x == 90, do:  "XC"
-	def number(x) when x == 100, do:  "X"
+	def number(x) when x == 100, do:  "C"
 	def number(x) when x == 400, do:  "CD"
 	def number(x) when x == 500, do:  "D"
 	def number(x) when x == 900, do:  "CM"
@@ -52,66 +50,145 @@ defmodule Roman do
 
 	def to_dec(x) when is_list(x) do
 
-	
 		x
-		|> Enum.map(&Roman.number/1)
-		|> Enum.sum
+		
+		|> Enum.reduce(0, fn 
+
+			n , acc when byte_size(n) == 1 -> 
+
+				acc + Roman.number(n)
+
+			n , acc  -> 
+
+				acc + n
+							|> String.split("", [trim: true])
+							|> Enum.reduce(0 , fn a , aux -> Roman.number(a) + aux end)
+				
+
+
+		end)
 		
 
+		
 	end
 
 	def to_dec(x) when is_binary(x) do
+
+		if String.match?(x , ~r/(IX|XL|XC|CD|CM|IV)/), do:
+			x
+			|> String.split(~r/(IX|XL|XC|CD|CM|IV)/, [include_captures: true, trim: true])
+
+			|> Roman.to_dec,
+		else:
 		
-		x
-		|> String.replace("IV","|IV|")
-		|> String.replace("IX","|IX|")
-		|> String.replace("XL","|XL|")
-		|> String.replace("IV","|IV|")
-		|> String.replace("CD","|CD|")
-		|> String.replace("CM","|CM|")
-		|> String.split("|", [trim: true])
-		|> Roman.to_dec
+			x
+			|> String.split("", [trim: true])
+			|> Roman.to_dec
 
 
 	end 
 
-	def from(x) when is_list(x) do
+	def from(x) when is_list(x)  do
 		
 		x
-		|> Enum.reverse(fn x -> end)
+		|> Enum.to_list
+		|> Enum.flat_map_reduce(0 , fn 
+
+			n,acc when n in [4,9,5] and acc < 3 -> 
+
+				{[n 
+					|> Kernel.*(:math.pow(10,acc)) 
+					|> Kernel.trunc 
+					|> Roman.number], acc + 1}
+
+			n,acc when n < 5  and acc < 3 ->
+
+				{10
+				|> :math.pow(acc)
+				|> Roman.number
+				|> String.duplicate(n)
+				|> List.wrap , acc + 1}
+
+			n,acc when n > 5  and acc < 3 ->
+
+				prefix = 5
+								 |> Kernel.*(:math.pow(10,acc)) 
+								 |> Kernel.trunc 
+					       |> Roman.number
+
+				ret = Kernel.<>(prefix ,
+						10
+						|> :math.pow(acc)
+						|> IO.inspect
+						|> Roman.number
+						|> String.duplicate(n - 5)
+			
+					)
+					|> List.wrap	       
+
+				{ ret , acc + 1}
+
+			
+			n,acc when acc >= 3 ->
+
+				{ [String.duplicate("M", n)] , acc + 1}
+			  				
+
+		end)
+		|> elem(0)
+		|> Enum.reverse
+		|> Enum.join
+	
 
 	end
 
 	def from(x) when is_integer(x) do
 		x
 		|> Integer.digits
+		|> Enum.reverse
 		|> Roman.from		
 
 		
 	end
 
+	
+
 end
 
 
 
+non_minimal_form = fn n -> 
 
-Roman.to_dec("XIX") |> IO.inspect
-
-
-# end		
-
-#IVIXXLXCCDCM
+	[Regex.scan(~r/.C{4,}/, n) , Regex.scan(~r/.X{4,}/, n) , Regex.scan(~r/.I{4,}/, n)]
+	|> List.flatten
 
 
+end	
+
+# minimal_form = fn n -> 
+
+# 	String.match?(n , ~r/X{4,}/) || 
+# 	String.match?(n , ~r/I{4,}/) || 
+# 	String.match?(n , ~r/C{4,}/)  
 
 
-#I can only be placed before V and X.
-#X can only be placed before L and C.
-#C can only be placed before D and M
+# end	
 
-# IV
-# IX
-# XL
-# XC
-# CD
-# CM
+_r = File.read!("p089_roman.txt")
+		 |> String.split("\n") 
+		 |> Enum.flat_map(&non_minimal_form.(&1))
+
+		 |> Enum.reduce(0 ,fn x, acc -> 
+
+		 		minimal_form = x 
+		 									 |> Roman.to_dec 
+		 									 |> Roman.from
+
+		 		acc + (String.length(x) - String.length(minimal_form))
+
+		 end)
+		#|> Enum.map(&Roman.to_dec/1)
+		|> IO.inspect
+
+
+

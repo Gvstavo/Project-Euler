@@ -1,0 +1,1 @@
+/home/arch/Documents/Project-Euler/51-100/70/project_euler_70/target/debug/project_euler_70: /home/arch/Documents/Project-Euler/51-100/70/project_euler_70/src/main.rs /home/arch/Documents/Project-Euler/51-100/70/project_euler_70/src/totient.rs

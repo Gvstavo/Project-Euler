@@ -1,3 +1,5 @@
+use openssl::bn::BigNum;
+
 fn sqrt_cf(d: u64) -> Vec<u64>{
 
 	let r = unsafe {(d as f64).sqrt().floor().to_int_unchecked::<u64>()};
@@ -23,6 +25,7 @@ fn sqrt_cf(d: u64) -> Vec<u64>{
 			break;
 		}
 	}
+	ret.remove(0);
 	ret
 
 }
@@ -30,11 +33,11 @@ fn sqrt_cf(d: u64) -> Vec<u64>{
 #[derive(Debug)]
 struct Frac {
 	
-	cycle: Vec<u64>,
-	p: u64,
-	q: u64,
-	auxq: Vec<u64>,
-	auxp: Vec<u64>,
+	cycle: Vec<BigNum>,
+	p: BigNum,
+	q: BigNum,
+	auxq: Vec<BigNum>,
+	auxp: Vec<BigNum>,
 	x: u64
 }
 
@@ -44,11 +47,11 @@ impl Frac{
 	fn new(n: u64) -> Self{
 
 		Frac {
-			cycle: sqrt_cf(n),
-			p: unsafe{(n as f64).sqrt().to_int_unchecked::<u64>()},
-			q: 1,
-			auxq: vec![0,1],
-			auxp: vec![1],
+			cycle: sqrt_cf(n).iter().map(|x| BigNum::from_dec_str(x.to_string().as_str()).unwrap()).collect::<Vec<BigNum>>(),
+			p: BigNum::from_dec_str(unsafe{(n as f64).sqrt().to_int_unchecked::<u64>().to_string().as_str()}).unwrap(),
+			q: BigNum::from_u32(1).unwrap(),
+			auxq: vec![BigNum::from_u32(0).unwrap(),BigNum::from_u32(1).unwrap()],
+			auxp: vec![BigNum::from_u32(1).unwrap()],
 			x:0
 		}
 
@@ -56,40 +59,83 @@ impl Frac{
 
 }
 
-impl Iterator for Frac {
-    type Item = (u64,u64);
+impl Iterator for  Frac {
+	type Item = (BigNum,BigNum);
 
-    fn next(&mut self) -> Option<(u64,u64)>  {
+  fn next(&mut self) -> Option<(BigNum,BigNum)>  {
 	
-	    self.x = self.x + 1;
     	
-    	let len = self.cycle.len() as i64;	
+		let len = self.cycle.len() as i64;	
 
-    	let index = (((self.x as i64) % (len -1))) as usize;
-    	if self.x == 1{ self.auxp.push(self.p)}
+    let index = (((self.x as i64) % (len))) as usize;
 
-    	self.p = (*self.cycle.get(index+1).unwrap()) * (*self.auxp.get(1).unwrap()) + (*self.auxp.get(0).unwrap());
+    self.x = self.x + 1;
 
-    	self.q = (*self.cycle.get(index+1).unwrap()) * (*self.auxq.get(1).unwrap()) + (*self.auxq.get(0).unwrap());
-
-    	self.auxp.remove(0);
-
-    	self.auxp.push(self.p);
-
-    	self.auxq.remove(0);
-
-    	self.auxq.push(self.q);
+		if self.x == 1{ self.auxp.push(self.p.to_owned().unwrap())}
 
 
-    	Some((self.p,self.q))
+    self.p = (self.cycle.get(index).unwrap()) * (self.auxp.get(1).unwrap());
 
-    }
+    self.p = &self.p + (self.auxp.get(0).unwrap());
 
-   
+    self.q = (self.cycle.get(index).unwrap()) * (self.auxq.get(1).unwrap());
+
+    self.q = &self.q + (self.auxq.get(0).unwrap());
+
+    self.auxp.remove(0);
+
+    self.auxp.push(self.p.to_owned().unwrap());
+
+    self.auxq.remove(0);
+
+    self.auxq.push(self.q.to_owned().unwrap());
+
+
+   	Some((self.p.to_owned().unwrap(),self.q.to_owned().unwrap()))
+	}
+
 }
-fn main() {
-	let mut f = Frac::new(2);
+// // x² – Dy² = 1
 
-		
+fn pell_equation(d: u64) -> (BigNum,BigNum) {
+
+	let mut solution : (BigNum,BigNum);
+	let aux = BigNum::from_dec_str(d.to_string().as_str()).unwrap();
+	let ret = BigNum::from_u32(1).unwrap();
+	let mut f = Frac::new(d);
+
+	loop {
+
+		solution = f.next().unwrap();
+
+		if &(&solution.0 * &solution.0) - &(&(&aux * &solution.1) * &solution.1) == ret {break;}
+
+	}
+
+	solution
+	
+
+}
+
+
+fn main() {
+
+	let mut d = 0;
+	let mut x = BigNum::from_u32(0).unwrap();
+
+	for i in 2..=1000{
+		if (i as f64).sqrt().rem_euclid(1.0) == 0.0{continue;}
+
+
+		if x < pell_equation(i).0{
+			x = pell_equation(i).0;
+			d = i;
+		}
+	}
+
+	println!("{:?}", d); 
+
+
+
 
 }

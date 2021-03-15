@@ -4,80 +4,63 @@ use async_std::stream::*;
 use async_std::task::*;
 use std::pin::*;
 use std::cell::RefCell;
+use std::collections::HashMap;
 use futures::stream::{self, StreamExt};
 
-fn gcd(mut u: u64, mut v: u64) -> u64 {
+pub async fn is_prime(n: i64) -> bool{
 
-  if u == 0 {
-    return v;
-  } else if v == 0 {
-    return u;
+  if n == 2 { return true};
+  if n % 2 == 0 {return false};
+  if n == 1 {return false};
+  let s = (n as f64).sqrt().ceil();
+
+  let lim = s as i64;
+
+  let r = (3..=lim).step_by(2);
+
+  let mut stream = stream::iter(r);
+   
+  while let Some(number) = stream.next().await {
+      
+    if n % number == 0 { return false};
+    
   }
-  let i = u.trailing_zeros();  
-  u >>= i;
-  let j = v.trailing_zeros();  
-  v >>= j;
-  let k = min(i, j);
 
-  loop {
+  true
 
-    if u > v {
-      swap(&mut u, &mut v);
-    }
-
-    v -= u;
-    if v == 0 {
-      return u << k;
-    }
-
-    v >>= v.trailing_zeros();
-  }
 }
+
 #[derive(Debug)]
 pub struct Phi{
 
-  pub n: RefCell<u64>,
-  pub phi: RefCell<u64>
+  pub memomy: RefCell<HashMap<u64,u64>>
 }
 
 impl Phi{
   pub fn new() -> Self {
     Phi{
-      n: RefCell::new(1),
-      phi: RefCell::new(1)
+      memomy: RefCell::new(HashMap::new())
     }
   }
 
-   pub async fn next(&self){
-    let mut c = self.n.borrow_mut();
+  pub async fn next(&self, n: i64 ){
 
-    let mut count : u64 = 0;
+    let range = (3..n).step_by(2);
 
-    *c = *c + 1;
+    let stream = stream::iter(range);
+
+   // ret *= 1.0_f64 - (1.0_f64 / (*k as f64))
     
-    let mut stream = stream::iter(1..*c);
-
-    while let Some(number) = stream.next().await {
-      
-      if gcd(*c,number) == 1 {count+=1;}
+    stream.fold(1 ,|&x, acc| async move{
+      if is_prime(x).await{
+        acc * (1.0_f64 - (1.0_f64 / (x as f64)))
+      }
+      else {
+        acc
+      }
     
-    }
+    });
 
-    let mut p = self.phi.borrow_mut();
-
-    *p = count;
   }
 }
 
-
-// impl Stream for Phi {
-//     type Item = u64;
-
-//     async fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-      
-//       self.n += 1;
-      
-//       Poll::Ready(Some(self.n))
-
-//     }
-// }

@@ -1,7 +1,7 @@
 mod frac;
 use frac::Frac;
 
-fn phi_1_to_n(n: i64) -> (){
+fn phi_1_to_n(n: i64) -> Vec<i64> {
 
 	let mut phi : Vec<i64> = (0..=n).collect();
 
@@ -16,12 +16,12 @@ fn phi_1_to_n(n: i64) -> (){
 		}
 	};
 
-
+	phi
 }
 
 
 fn main() {
-
-	print!("{:?}", phi_1_to_n(8));
+	phi_1_to_n(12000);
+	// print!("{:?}", phi_1_to_n(10));
 
 }

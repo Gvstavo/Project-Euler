@@ -22,7 +22,7 @@ fn main() {
   let mut contents = String::new();
   buf_reader.read_to_string(&mut contents).unwrap();
 
-  let hands : Vec<&str> = contents.split("\n").collect();
+  let hands : Vec<(&str, &str)> = contents.split("\n").map(|x| x.split_at(14)).collect();
 
   println!("{:?}", hands);
 

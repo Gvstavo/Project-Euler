@@ -1,11 +1,17 @@
 defmodule Poker do
 
+	defp is_sequence(values) do
+		cards = 1..9 |> Enum.to_list |> Kernel.++(["T","J","Q","K","A"]) |> Enum.join
+
+	end
 
 	def ranking(hand) do
 
 		case hand do
 			
 			["A",suit,"K",suit,"Q",suit,"J",suit,"T",suit] -> :royal_flush
+			[v1,suit,v2,suit,v3,suit,v4,suit,v5,suit] -> :straight_flush
+
 			__ -> :high_card
 
 		end
